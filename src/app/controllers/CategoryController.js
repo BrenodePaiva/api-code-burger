@@ -79,14 +79,6 @@ class CategoryController {
     }
     const { name } = request.body
 
-    if (name) {
-      const categoryExist = await Category.findOne({ where: { name } })
-
-      if (categoryExist) {
-        return response.status(400).json({ message: 'Category already exist' })
-      }
-    }
-
     await Category.update(
       {
         name,
