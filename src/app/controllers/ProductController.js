@@ -2,7 +2,8 @@ import * as Yup from 'yup'
 
 import Product from '../models/Product'
 import Category from '../models/Category'
-import User from '../models/User'
+// import User from '../models/User'
+import fs from 'fs'
 
 class ProductController {
   // information product
@@ -22,26 +23,32 @@ class ProductController {
     }
 
     // Verify user admin
-    const { admin: isAdmin } = await User.findByPk(request.userId)
+    // const { admin: isAdmin } = await User.findByPk(request.userId)
 
-    if (!isAdmin) {
-      return response.status(401).json()
-    }
+    // if (!isAdmin) {
+    //   return response.status(401).json()
+    // }
 
     const { filename: path } = request.file
     const { name, price, category_id, offer } = request.body
 
-    // create product
-    const product = await Product.create({
-      name,
-      price,
-      category_id,
-      offer,
-      path,
-    })
+    try {
+      // create product
+      const product = await Product.create({
+        name,
+        price,
+        category_id,
+        offer,
+        path,
+      })
 
-    return response.json(product)
+      return response.status(200).json(product)
+    } catch (error) {
+      return response.status(500).json(error)
+    }
   }
+
+  // ____________________________________________________________________
 
   // list products with category name
   async index(request, response) {
@@ -72,11 +79,11 @@ class ProductController {
       return response.status(400).json({ error: err.errors })
     }
 
-    const { admin: isAdmin } = await User.findByPk(request.userId)
+    // const { admin: isAdmin } = await User.findByPk(request.userId)
 
-    if (!isAdmin) {
-      return response.status(401).json()
-    }
+    // if (!isAdmin) {
+    //   return response.status(401).json()
+    // }
 
     const { id } = request.params
     let product = await Product.findByPk(id)
@@ -87,25 +94,41 @@ class ProductController {
 
     let path
     if (request.file) {
+      await fs.promises.unlink(product.path)
       path = request.file.filename
     }
     const { name, price, category_id, offer } = request.body
 
-    await Product.update(
-      {
-        name,
-        price,
-        category_id,
-        offer,
-        path,
-      },
-      { where: { id } }
-    )
+    try {
+      await Product.update(
+        {
+          name,
+          price,
+          category_id,
+          offer,
+          path,
+        },
+        { where: { id } }
+      )
 
-    product = await Product.findByPk(id)
-    return response.json(product)
+      product = await Product.findByPk(id)
+      return response.status(200).json(product)
+    } catch (error) {
+      return response.status(500).json(error)
+    }
+  }
 
-    // return response.json({ message: 'Product was updated' })
+  // ____________________________________________________________________
+
+  async delete(request, response) {
+    const { id } = request.params
+
+    try {
+      await Product.destroy({ where: { id } })
+      return response.status(200).json({ message: 'Product deleted' })
+    } catch (error) {
+      return response.status(500).json(error)
+    }
   }
 }
 

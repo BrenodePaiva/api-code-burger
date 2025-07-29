@@ -10,3 +10,10 @@ node_modules
 # Documentation here: https://yarnpkg.com/features/zero-installs
 !.yarn/cache
 #.pnp.*
+
+.sequelizerc
+.prettierrc
+.eslintrc.js
+.editorconfig
+
+src/database/migrations/

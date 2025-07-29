@@ -1,18 +1,22 @@
 import * as Yup from 'yup'
 import Product from '../models/Product'
-import Category from '../models/Category'
-import Order from '../schemas/Order'
+// import Category from '../models/Category'
+import Order from '../models/Order'
 import User from '../models/User'
+import { nanoid } from 'nanoid'
+import OrderItems from '../models/OrderItems'
 
 class OrderController {
   // information order
   async store(request, response) {
     const schema = Yup.object().shape({
+      user: Yup.string().required(),
       products: Yup.array()
         .required()
         .of(
           Yup.object().shape({
             id: Yup.number().required(),
+            price: Yup.number().required(),
             quantity: Yup.number().required(),
           })
         ),
@@ -25,57 +29,134 @@ class OrderController {
       return response.status(400).json({ error: err.errors })
     }
 
-    const productsId = request.body.products.map((product) => product.id)
+    const { user } = request.body
 
-    const orderProduct = await Product.findAll({
-      where: {
-        id: productsId,
-      },
-      include: [
-        {
-          model: Category,
-          as: 'category',
-          attributes: ['name'],
-        },
-      ],
-    })
+    try {
+      const order = await Order.create({
+        id: nanoid(12),
+        user_id: user,
+        status: 'Pedido realizado',
+      })
 
-    const editedProduct = orderProduct.map((product) => {
-      const productIndex = request.body.products.findIndex(
-        (index) => index.id === product.id
+      const items = await Promise.all(
+        request.body.products.map(async (product) => {
+          const orderItems = await OrderItems.create({
+            order_id: order.id,
+            product_id: product.id,
+            unit_price: product.price,
+            quantity: product.quantity,
+          })
+          return orderItems
+        })
       )
 
-      const newProduct = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        category: product.category.name,
-        url: product.url,
-        quantity: request.body.products[productIndex].quantity,
-      }
-      return newProduct
-    })
+      const allOrders = await Order.findOne({
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['name'],
+          },
+        ],
+        where: { id: order.id },
+      })
 
-    const order = {
-      user: {
-        id: request.userId,
-        name: request.userName,
-      },
-      products: editedProduct,
-      status: 'Pedido realizado',
+      const allItems = await OrderItems.findAll({
+        include: [
+          {
+            model: Product,
+            as: 'product',
+            attributes: ['name', 'url', 'path'],
+          },
+          {
+            model: Order,
+            as: 'order',
+            attributes: ['user_id'],
+          },
+        ],
+        where: { order_id: order.id },
+      })
+
+      const io = request.app.get('io')
+
+      io.to('kitchen').emit('new-order', {
+        order: allOrders,
+        items: allItems,
+      })
+
+      // io.to('kitchen').emit('updated-all-order', order)
+
+      return response.status(200).json({ order, items })
+    } catch (error) {
+      return response.status(500).json(error)
     }
-
-    const createOrder = await Order.create(order)
-
-    return response.status(201).json(createOrder)
   }
+
+  // ___________________________________________________________________
 
   // Find all prduct
   async index(request, response) {
-    const allOrders = await Order.find()
+    const { user } = request.params
+    let allOrders
+    let items
 
-    return response.json(allOrders)
+    if (user !== '0') {
+      allOrders = await Order.findAll({
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['name'],
+          },
+        ],
+        where: { user_id: user },
+        order: [['created_at', 'DESC']],
+      })
+
+      items = await OrderItems.findAll({
+        include: [
+          {
+            model: Product,
+            as: 'product',
+            attributes: ['name', 'url', 'path'],
+          },
+          {
+            model: Order,
+            as: 'order',
+            attributes: ['user_id'],
+          },
+        ],
+        where: { '$order.user_id$': user },
+        order: [['created_at', 'DESC']],
+      })
+    } else {
+      allOrders = await Order.findAll({
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['name'],
+          },
+        ],
+        order: [['created_at', 'DESC']],
+      })
+
+      items = await OrderItems.findAll({
+        include: [
+          {
+            model: Product,
+            as: 'product',
+            attributes: ['name', 'url', 'path'],
+          },
+        ],
+        order: [['created_at', 'DESC']],
+      })
+    }
+
+    return response.status(200).json({ allOrders, items })
   }
+
+  // ____________________________________________________________________
 
   // Update product
   async update(request, response) {
@@ -88,18 +169,52 @@ class OrderController {
 
     try {
       await schema.validateSync(request.body)
-      await Order.updateOne({ _id: id }, { status })
+
+      const hasOrder = await Order.update({ status }, { where: { id } })
+
+      if (!hasOrder) {
+        return response.status(404).json({ message: 'Order not found' })
+      }
+
+      const order = await Order.findByPk(id)
+
+      const io = request.app.get('io')
+      io.to(`client-${order.user_id}`).emit('updated-order', order)
+
+      io.to('kitchen').emit('updated-all-order', order)
+
+      // ⚡ Emitir evento via WebSocket
+      // const io = request.app.get('io')
+      // io.emit('order-updated', { id: Number(id), status })
+
+      return response.json({ message: 'status was updated' })
     } catch (err) {
       return response.status(400).json({ error: err.message })
     }
 
     // Verify user admin
-    const { admin: isAdmin } = await User.findByPk(request.userId)
-    if (!isAdmin) {
-      return response.status(401).json()
-    }
+    // const { admin: isAdmin } = await User.findByPk(request.userId)
+    // if (!isAdmin) {
+    //   return response.status(401).json()
+    // }
+  }
 
-    return response.json({ message: 'status was updated' })
+  // ____________________________________________________________________
+
+  async del(request, response) {
+    const { id } = request.params
+
+    try {
+      await Order.destroy({ where: { id } })
+
+      const io = request.app.get('io')
+
+      io.to('kitchen').emit('delete-order', id)
+
+      return response.status(200).json({ message: 'Order deleted' })
+    } catch (error) {
+      return response.status(500).json(error)
+    }
   }
 }
 

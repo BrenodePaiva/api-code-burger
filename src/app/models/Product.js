@@ -5,13 +5,13 @@ class Product extends Model {
     super.init(
       {
         name: Sequelize.STRING,
-        price: Sequelize.INTEGER,
+        price: Sequelize.DECIMAL,
         path: Sequelize.STRING,
         offer: Sequelize.BOOLEAN,
         url: {
           type: Sequelize.VIRTUAL,
           get() {
-            return `https://api-code-burger-production-706c.up.railway.app/product-file/${this.path}`
+            return `http://localhost:3000/product-file/${this.path}`
           },
         },
       },

@@ -6,15 +6,10 @@ import { resolve } from 'path'
 import cors from 'cors'
 import './database'
 
-const corsOptions = {
-  origin: 'https://code-burger-interface-rho.vercel.app',
-  credentials: true,
-}
-
 class App {
   constructor() {
     this.app = express()
-    this.app.use(cors(corsOptions))
+    this.app.use(cors())
     this.middlewares()
     this.routes()
   }

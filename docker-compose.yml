@@ -1,0 +1,16 @@
+services:
+
+  db:
+    image: mysql
+    
+    environment:
+      - 'MYSQL_ROOT_PASSWORD=root'    
+      - 'MYSQL_USER=mysql'
+      - 'MYSQL_PASSWORD=mysql'
+      - 'MYSQL_DATABASE=codeburger'
+    ports:
+      - 3306:3306
+    volumes:
+      - mysqldados:/var/lib/mysql
+volumes:
+  mysqldados:

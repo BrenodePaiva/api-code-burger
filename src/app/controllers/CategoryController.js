@@ -1,6 +1,6 @@
 import * as Yup from 'yup'
 import Category from '../models/Category'
-import User from '../models/User'
+// import User from '../models/User'
 
 class CategoryController {
   // information category
@@ -17,11 +17,11 @@ class CategoryController {
     }
 
     // Verify user admin
-    const { admin: isAdmin } = await User.findByPk(request.userId)
+    // const { admin: isAdmin } = await User.findByPk(request.userId)
 
-    if (!isAdmin) {
-      return response.status(401).json()
-    }
+    // if (!isAdmin) {
+    //   return response.status(401).json()
+    // }
 
     const { name } = request.body
 
@@ -41,11 +41,15 @@ class CategoryController {
     return response.json({ id: category.id, name, path })
   }
 
+  // ___________________________________________________________________________
+
   // list category
   async index(request, response) {
     const categories = await Category.findAll()
     return response.json(categories)
   }
+
+  // ___________________________________________________________________________
 
   // update category
   async update(request, response) {
@@ -59,11 +63,11 @@ class CategoryController {
       return response.status(400).json({ error: err.errors })
     }
 
-    const { admin: isAdmin } = await User.findByPk(request.userId)
+    // const { admin: isAdmin } = await User.findByPk(request.userId)
 
-    if (!isAdmin) {
-      return response.status(401).json()
-    }
+    // if (!isAdmin) {
+    //   return response.status(401).json()
+    // }
 
     const { id } = request.params
     let category = await Category.findByPk(id)
