@@ -1,8 +1,8 @@
 import * as Yup from 'yup'
-import User from '../models/User'
+import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
 
-import { oauth2client } from '../../config/google'
+import { oauth2client } from '../../config/google.js'
 
 import { v4 } from 'uuid'
 import crypto from 'crypto'
@@ -10,7 +10,7 @@ import 'dotenv/config'
 import { google } from 'googleapis'
 import path from 'path'
 import fs from 'fs'
-import sendEmail from '../../utils/Email'
+import sendEmail from '../../utils/Email.js'
 import { Sequelize } from 'sequelize'
 
 class SessionController {

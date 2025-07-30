@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import Category from '../models/Category'
+import Category from '../models/Category.js'
 // import User from '../models/User'
 
 class CategoryController {

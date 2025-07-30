@@ -19,3 +19,10 @@ node_modules
 src/database/migrations/
 
 .env
+.prettierrc
+.sequelizerc
+docker-compose.yml
+nodemon.json
+.eslintrc.js
+.editorconfig
+.vscode

@@ -1,10 +1,9 @@
 import * as Yup from 'yup'
-import Product from '../models/Product'
-// import Category from '../models/Category'
-import Order from '../models/Order'
-import User from '../models/User'
+import Product from '../models/Product.js'
+import Order from '../models/Order.js'
+import User from '../models/User.js'
 import { nanoid } from 'nanoid'
-import OrderItems from '../models/OrderItems'
+import OrderItems from '../models/OrderItems.js'
 
 class OrderController {
   // information order

@@ -2,17 +2,18 @@
 import { Router } from 'express'
 import multer from 'multer'
 
-import multerConfig from './config/multer'
+import multerConfig from './config/multer.js'
 
-import UserController from './app/controllers/UserController'
-import SessionController from './app/controllers/SessionController'
-import ProductController from './app/controllers/ProductController'
-import CategoryController from './app/controllers/CategoryController'
-import OrderController from './app/controllers/OrderController'
+import UserController from './app/controllers/UserController.js'
+import SessionController from './app/controllers/SessionController.js'
+import ProductController from './app/controllers/ProductController.js'
+import CategoryController from './app/controllers/CategoryController.js'
+import OrderController from './app/controllers/OrderController.js'
 
-import authMiddleware from './app/middlewares/auth'
-import DataBase from './database'
-import isAdmin from './app/middlewares/isAdmin'
+import authMiddleware from './app/middlewares/auth.js'
+import DataBase from './database/index.js'
+import isAdmin from './app/middlewares/isAdmin.js'
+import 'dotenv/config'
 
 const routes = new Router()
 const upload = multer(multerConfig)
@@ -22,7 +23,7 @@ routes.get('/', (req, res) => {
     .authenticate()
     .then(() => {
       return res.send(
-        `🚀 Server started on port: ${3000} <br/> <br/> 
+        `🚀 Server started on port: ${process.env.PORT} <br/> <br/> 
         ✅ Connection to the database stablished successfully.`
       )
     })

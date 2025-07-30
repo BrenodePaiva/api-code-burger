@@ -8,5 +8,5 @@ export const oauth2client = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   //   'postmessage'
-  'http://localhost:3000/auth/google/callback'
+  'http://localhost:3001/auth/google/callback'
 )

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import auth from '../../config/auth'
+import 'dotenv/config'
 
 export default (request, response, next) => {
   const authToken = request.headers.authorization
@@ -11,7 +11,7 @@ export default (request, response, next) => {
   const token = authToken.split(' ')[1]
 
   try {
-    jwt.verify(token, auth.secret, function (err, decoded) {
+    jwt.verify(token, process.env.SESSION_SECRET, function (err, decoded) {
       if (err) {
         throw new Error()
       }
