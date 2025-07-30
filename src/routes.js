@@ -28,7 +28,7 @@ routes.get('/', (req, res) => {
       )
     })
     .catch((error) => {
-      return res.send('❌ Error connecting to database: ', error)
+      return res.send(`❌ Error connecting to database: ${error}`)
     })
 })
 
