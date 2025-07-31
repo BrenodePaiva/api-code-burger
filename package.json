@@ -4,8 +4,8 @@
   "main": "src/server.js",
   "scripts": {
     "build": "sucrase ./src -d ./dist --transforms imports",
-    "start": "pm2 start dist/index.js --name api-codeburge",
-    "stop":"pm2 stop api-codeburge",
+    "start": "pm2 start dist/server.js --name api-codeburge",
+    "stop": "pm2 stop api-codeburge",
     "dev": "nodemon",
     "debug": "nodemon --inspect"
   },
