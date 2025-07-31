@@ -18,6 +18,8 @@ node_modules
 
 src/database/migrations/
 
+src/
+
 .env
 .prettierrc
 .sequelizerc

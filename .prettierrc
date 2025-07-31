@@ -1,7 +1,0 @@
-{     
-    "semi": false,
-    "singleQuote": true,
-    "parser": "flow",
-    "trailingComma": "es5",
-    "endOfLine": "auto"
-}
