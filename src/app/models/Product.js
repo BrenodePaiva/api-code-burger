@@ -1,4 +1,5 @@
 import Sequelize, { Model } from 'sequelize'
+import 'dotenv/config'
 
 class Product extends Model {
   static init(sequelize) {
@@ -11,7 +12,7 @@ class Product extends Model {
         url: {
           type: Sequelize.VIRTUAL,
           get() {
-            return `http://localhost:3001/product-file/${this.path}`
+            return `${process.env.API_URL}/product-file/${this.path}`
           },
         },
       },

@@ -119,10 +119,10 @@ class SessionController {
       )
       // Depois redirecione para a sua aplicação (React), com ou sem token na URL
       return response.redirect(
-        `http://localhost:5173/?email=${user.email}&name=${user.name}&token=${token}&id=${user.id}&google=${user?.google_id}`
+        `${process.env.API_CONSUMER}/?email=${user.email}&name=${user.name}&token=${token}&id=${user.id}&google=${user?.google_id}`
       )
     } catch (error) {
-      return response.redirect('http://localhost:5173/?error=google-auth')
+      return response.redirect(`${process.env.API_CONSUMER}/?error=google-auth`)
     }
   }
 
@@ -193,7 +193,7 @@ class SessionController {
     const resetToken = user.createResetPasswordToken()
     await user.save({ validate: false })
 
-    const resetUrl = `http://localhost:5173/resetar-senha/${resetToken}`
+    const resetUrl = `${process.env.API_CONSUMER}/resetar-senha/${resetToken}`
 
     htmlmail = fs.readFileSync(
       path.join(__dirname, '..', '..', 'utils', 'mail.html'),

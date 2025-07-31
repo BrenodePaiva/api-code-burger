@@ -8,5 +8,5 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   //   'postmessage'
-  'http://localhost:3001/auth/google/callback'
+  process.env.GOOGLE_REDIRECT_URI
 ); exports.oauth2client = oauth2client
