@@ -8,6 +8,8 @@ var _databasejs = require('../config/database.js'); var _databasejs2 = _interopR
 var _Orderjs = require('../app/models/Order.js'); var _Orderjs2 = _interopRequireDefault(_Orderjs);
 var _OrderItemsjs = require('../app/models/OrderItems.js'); var _OrderItemsjs2 = _interopRequireDefault(_OrderItemsjs);
 
+require('dotenv/config');
+
 const models = [_Userjs2.default, _Productjs2.default, _Categoryjs2.default, _Orderjs2.default, _OrderItemsjs2.default]
 
 class Database {
@@ -16,7 +18,7 @@ class Database {
   }
 
   init() {
-    this.connection = new (0, _sequelize2.default)(_databasejs2.default)
+    this.connection = new (0, _sequelize2.default)(process.env.DB_URL, { ConfigDatabase: _databasejs2.default })
     models
       .map((model) => model.init(this.connection))
       .map(
