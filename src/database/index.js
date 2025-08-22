@@ -8,6 +8,8 @@ import ConfigDatabase from '../config/database.js'
 import Order from '../app/models/Order.js'
 import OrderItems from '../app/models/OrderItems.js'
 
+import 'dotenv/config'
+
 const models = [User, Product, Category, Order, OrderItems]
 
 class Database {
@@ -16,7 +18,7 @@ class Database {
   }
 
   init() {
-    this.connection = new Sequelize(ConfigDatabase)
+    this.connection = new Sequelize(process.env.DB_URL, { ConfigDatabase })
     models
       .map((model) => model.init(this.connection))
       .map(
